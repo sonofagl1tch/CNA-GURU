@@ -3,3 +3,4 @@ requests_aws4auth
 
 # Security vulnerability fix
 requests>=2.32.4
+urllib3>=2.6.0 # not directly required, pinned by Snyk to avoid a vulnerability
