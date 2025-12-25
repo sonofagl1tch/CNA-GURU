@@ -1,4 +1,4 @@
-streamlit>=1.27.0    # CVE fix: CWE-117 Improper Output Neutralization for Logs
+streamlit>=1.37.0    # CVE fix: CWE-117, CWE-22 Path Traversal
 streamlit_chat>=0.1.1
 boto3>=1.40.0
 PyYAML>=6.0.1

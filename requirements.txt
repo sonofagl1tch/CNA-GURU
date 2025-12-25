@@ -1,8 +1,8 @@
 # Core dependencies
 boto3>=1.40.0
 opensearch-py>=3.0.0
-requests>=2.32.2     # CVE fix: CWE-670 Always-Incorrect Control Flow Implementation
-streamlit>=1.27.0    # CVE fix: CWE-117 Improper Output Neutralization for Logs
+requests>=2.32.4     # CVE fix: CWE-670, CWE-201 Sensitive Information Insertion
+streamlit>=1.37.0    # CVE fix: CWE-117, CWE-22 Path Traversal
 
 # Security dependencies
 cryptography>=41.0.7  # For secure cryptographic operations
@@ -18,11 +18,11 @@ pyOpenSSL>=23.2.0    # For SSL/TLS support
 
 # Additional security fixes
 pyarrow>=14.0.1      # CVE fix: CWE-502 Deserialization of Untrusted Data (CVSS 9.8)
-pillow>=10.0.0       # CVE fix: CWE-400 Uncontrolled Resource Consumption
+pillow>=10.2.0       # CVE fix: CWE-122 Heap Buffer Overflow (CVSS 9.6), CWE-95 Eval Injection
 protobuf>=4.25.8     # CVE fix: CWE-674 Uncontrolled Recursion
-tornado>=6.3.2       # CVE fix: CWE-601 Open Redirect
+tornado>=6.5         # CVE fix: CWE-601, CWE-93 CRLF Injection, CWE-444 HTTP Smuggling
 zipp>=3.19.1         # CVE fix: CWE-835 Infinite loop
-numpy>=1.22.0        # CVE fix: CWE-119 Buffer Overflow
+numpy>=1.22.2        # CVE fix: CWE-119 Buffer Overflow, CWE-476 NULL Pointer Dereference
 
 # Testing and development dependencies
 pytest>=7.4.3
