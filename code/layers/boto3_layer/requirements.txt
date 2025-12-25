@@ -1,1 +1,5 @@
 boto3>=1.40.0
+
+# Security vulnerability fixes
+urllib3>=2.5.0
+requests>=2.32.4
