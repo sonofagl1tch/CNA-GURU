@@ -1,0 +1,50 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f5e9', 'primaryTextColor': '#2e7d32', 'primaryBorderColor': '#43a047', 'lineColor': '#546e7a'}}}%%
+
+flowchart LR
+    subgraph Step1["1️⃣ Ask"]
+        User["🧑‍💻 Analyst"]
+        Question["Enter vulnerability<br/>description"]
+    end
+
+    subgraph Step2["2️⃣ Process"]
+        Parse["Parse &<br/>understand query"]
+        Search["Search knowledge<br/>base"]
+        Analyze["Analyze with<br/>Claude AI"]
+    end
+
+    subgraph Step3["3️⃣ Respond"]
+        CWE["Recommended<br/>CWE(s)"]
+        Reasoning["Supporting<br/>reasoning"]
+        Sources["Reference<br/>citations"]
+    end
+
+    subgraph Step4["4️⃣ Refine"]
+        Followup["Ask follow-up<br/>questions"]
+        Compare["Compare<br/>alternatives"]
+        Clarify["Get<br/>clarification"]
+    end
+
+    User --> Question
+    Question --> Parse
+    Parse --> Search
+    Search --> Analyze
+    Analyze --> CWE
+    Analyze --> Reasoning
+    Analyze --> Sources
+    CWE --> Followup
+    Reasoning --> Compare
+    Sources --> Clarify
+    Followup --> Parse
+    Compare --> Parse
+    Clarify --> Parse
+
+    %% Styling
+    classDef step1Style fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#1b5e20
+    classDef step2Style fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d47a1
+    classDef step3Style fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c
+    classDef step4Style fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#e65100
+
+    class User,Question step1Style
+    class Parse,Search,Analyze step2Style
+    class CWE,Reasoning,Sources step3Style
+    class Followup,Compare,Clarify step4Style

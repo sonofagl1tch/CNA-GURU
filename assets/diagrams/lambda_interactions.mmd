@@ -1,0 +1,63 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#fff3e0', 'primaryTextColor': '#e65100', 'primaryBorderColor': '#ef6c00', 'lineColor': '#546e7a'}}}%%
+
+flowchart TB
+    subgraph Triggers["🎯 Triggers"]
+        User["User Query"]
+        CDKDeploy["CDK Deploy"]
+    end
+
+    subgraph InvokeLambda["⚡ Invoke Lambda"]
+        direction TB
+        IL_Desc["Receives user questions<br/>from Streamlit app"]
+        IL_Action["Calls Bedrock Agent<br/>with session context"]
+    end
+
+    subgraph ActionLambda["⚡ Action Lambda"]
+        direction TB
+        AL_Desc["Executes agent actions<br/>for custom operations"]
+        AL_Action["Handles extended<br/>agent capabilities"]
+    end
+
+    subgraph CreateIndexLambda["⚡ Create Index Lambda"]
+        direction TB
+        CI_Desc["One-time setup during<br/>deployment"]
+        CI_Action["Creates OpenSearch<br/>vector index"]
+    end
+
+    subgraph UpdateLambda["⚡ Update Lambda"]
+        direction TB
+        UL_Desc["Post-deployment<br/>configuration"]
+        UL_Action["• Syncs Knowledge Base<br/>• Prepares Bedrock Agent"]
+    end
+
+    subgraph Services["🔗 Connected Services"]
+        Bedrock["Bedrock Agent"]
+        OpenSearch["OpenSearch"]
+        KB["Knowledge Base"]
+    end
+
+    User --> InvokeLambda
+    InvokeLambda --> Bedrock
+    Bedrock --> ActionLambda
+    
+    CDKDeploy --> CreateIndexLambda
+    CreateIndexLambda --> OpenSearch
+    
+    CDKDeploy --> UpdateLambda
+    UpdateLambda --> KB
+    UpdateLambda --> Bedrock
+
+    %% Styling
+    classDef triggerStyle fill:#e0f7fa,stroke:#00838f,stroke-width:2px,color:#006064
+    classDef invokeStyle fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#1b5e20
+    classDef actionStyle fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#e65100
+    classDef createStyle fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d47a1
+    classDef updateStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c
+    classDef serviceStyle fill:#fafafa,stroke:#757575,stroke-width:2px,color:#424242
+
+    class User,CDKDeploy triggerStyle
+    class IL_Desc,IL_Action invokeStyle
+    class AL_Desc,AL_Action actionStyle
+    class CI_Desc,CI_Action createStyle
+    class UL_Desc,UL_Action updateStyle
+    class Bedrock,OpenSearch,KB serviceStyle

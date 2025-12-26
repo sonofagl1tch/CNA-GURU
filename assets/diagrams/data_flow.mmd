@@ -1,0 +1,59 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e3f2fd', 'primaryTextColor': '#1565c0', 'primaryBorderColor': '#1976d2', 'lineColor': '#546e7a'}}}%%
+
+flowchart TB
+    subgraph Input["📥 Data Sources"]
+        CWE["CWE Database<br/>(ZIP Archive)"]
+        Schema["Agent API Schema<br/>(JSON)"]
+    end
+
+    subgraph Ingestion["⚙️ Data Ingestion"]
+        S3Deploy["S3 Bucket<br/>Deployment"]
+        Sync["Knowledge Base<br/>Sync"]
+    end
+
+    subgraph Processing["🔄 Data Processing"]
+        Embed["Titan Embeddings<br/>Model"]
+    end
+
+    subgraph Storage["💾 Indexed Storage"]
+        Vector["OpenSearch<br/>Vector Index"]
+    end
+
+    subgraph Retrieval["🔍 Query & Retrieval"]
+        KBQuery["Knowledge Base<br/>Semantic Search"]
+    end
+
+    subgraph Output["📤 Response Generation"]
+        Agent["Bedrock Agent"]
+        Response["AI-Generated<br/>Answer"]
+    end
+
+    %% Data Flow
+    CWE --> S3Deploy
+    Schema --> S3Deploy
+    
+    S3Deploy --> Sync
+    
+    Sync --> Embed
+    
+    Embed --> Vector
+    
+    Vector --> KBQuery
+    
+    KBQuery --> Agent
+    Agent --> Response
+
+    %% Styling
+    classDef inputStyle fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#e65100
+    classDef ingestStyle fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#1b5e20
+    classDef processStyle fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d47a1
+    classDef storageStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c
+    classDef retrieveStyle fill:#e0f7fa,stroke:#00838f,stroke-width:2px,color:#006064
+    classDef outputStyle fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#1b5e20
+
+    class CWE,Schema inputStyle
+    class S3Deploy,Sync ingestStyle
+    class Embed processStyle
+    class Vector storageStyle
+    class KBQuery retrieveStyle
+    class Agent,Response outputStyle

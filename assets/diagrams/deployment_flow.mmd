@@ -1,0 +1,76 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e3f2fd', 'primaryTextColor': '#1565c0', 'primaryBorderColor': '#1976d2', 'lineColor': '#546e7a'}}}%%
+
+flowchart TB
+    subgraph Prerequisites["📋 Prerequisites"]
+        Python["Python 3.11+"]
+        Docker["Docker"]
+        CDK["AWS CDK 2.114+"]
+        AWS["AWS Account<br/>with Bedrock"]
+    end
+
+    subgraph Setup["🔧 Local Setup"]
+        Clone["Clone repository"]
+        Venv["Create virtual<br/>environment"]
+        Install["Install<br/>dependencies"]
+        Env["Configure<br/>.env file"]
+    end
+
+    subgraph Deploy["🚀 CDK Deployment"]
+        Bootstrap["cdk bootstrap<br/>(first time)"]
+        Synth["cdk synth"]
+        DeployCmd["cdk deploy"]
+    end
+
+    subgraph Created["☁️ AWS Resources Created"]
+        direction TB
+        VPC["VPC + Subnets"]
+        ECS["ECS Cluster"]
+        Lambda["Lambda Functions"]
+        S3["S3 Buckets"]
+        Bedrock["Bedrock Agent<br/>+ Knowledge Base"]
+        OpenSearch["OpenSearch<br/>Serverless"]
+    end
+
+    subgraph PostDeploy["✅ Post-Deployment"]
+        URL["Get ALB URL<br/>from outputs"]
+        Access["Access<br/>chatbot"]
+        Test["Test with<br/>sample CVE"]
+    end
+
+    Python --> Clone
+    Docker --> Clone
+    CDK --> Clone
+    AWS --> Clone
+    
+    Clone --> Venv
+    Venv --> Install
+    Install --> Env
+    
+    Env --> Bootstrap
+    Bootstrap --> Synth
+    Synth --> DeployCmd
+    
+    DeployCmd --> VPC
+    DeployCmd --> ECS
+    DeployCmd --> Lambda
+    DeployCmd --> S3
+    DeployCmd --> Bedrock
+    DeployCmd --> OpenSearch
+    
+    VPC --> URL
+    ECS --> URL
+    URL --> Access
+    Access --> Test
+
+    %% Styling
+    classDef prereqStyle fill:#ffecb3,stroke:#ff8f00,stroke-width:2px,color:#e65100
+    classDef setupStyle fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d47a1
+    classDef deployStyle fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#1b5e20
+    classDef awsStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c
+    classDef postStyle fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#1b5e20
+
+    class Python,Docker,CDK,AWS prereqStyle
+    class Clone,Venv,Install,Env setupStyle
+    class Bootstrap,Synth,DeployCmd deployStyle
+    class VPC,ECS,Lambda,S3,Bedrock,OpenSearch awsStyle
+    class URL,Access,Test postStyle
