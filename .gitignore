@@ -155,6 +155,7 @@ Dockerfile.dockerignore
 # IDE and Editor files
 .vscode/
 .idea/
+.kiro/
 *.swp
 *.swo
 *~
