@@ -95,66 +95,14 @@ security-advisory-assistant/
 └── tests/                         # Unit tests
 ```
 
-## Key Modules
+## Documentation
 
-### CDK Stack (`code/code_stack.py`)
-
-The `CodeStack` class deploys all AWS infrastructure:
-
-```python
-class CodeStack(Stack):
-    """Main CDK stack for Security Advisory Assistant."""
-    
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None
-```
-
-Key methods:
-
-- `create_kms_key()` - Creates KMS key for encryption
-- `create_data_source_bucket()` - S3 buckets for assets and Athena
-- `create_glue_database()` - Glue crawler and database for structured data
-- `create_opensearch_index()` - OpenSearch Serverless vector store
-- `create_bedrock_agent()` - Bedrock Agent with Knowledge Base
-- `create_streamlit_app()` - ECS Fargate service for web UI
-
-### Invoke Lambda (`code/lambdas/invoke-lambda/index.py`)
-
-Handles agent invocation requests from the Streamlit app:
-
-```python
-def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]
-    """Main Lambda handler with security controls."""
-
-def invoke_agent(user_input: str, session_id: str) -> Dict[str, Any]
-    """Get response from Agent with rate limiting and validation."""
-
-def get_agent_response(response: Dict[str, Any]) -> Tuple[str, str, List[str]]
-    """Process streaming agent response into text and citations."""
-```
-
-### Action Lambda (`code/lambdas/action-lambda/index.py`)
-
-Processes Bedrock Agent action group requests:
-
-```python
-def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]
-    """Main Lambda handler with error handling."""
-
-def get_response(event: Dict[str, Any], context: Any) -> Dict[str, Any]
-    """Get response from RAG or Query engine with security controls."""
-```
-
-API paths:
-- `/uc1` - Knowledge base document retrieval
-- `/uc2` - SQL query generation via text-to-SQL
-
-### Security Middleware (`code/security/middleware.py`)
-
-Decorators for security controls:
-- `@validate_input` - Input sanitization and validation
-- `@error_handler` - Secure error handling
-- `@audit_log` - Audit logging for compliance
-- `@rate_limit(max_calls, time_window)` - Rate limiting
+- [API Reference](./docs/API_REFERENCE.md) - Detailed API documentation for all components
+- [Architecture Diagrams](./assets/diagrams/) - Visual diagrams of system architecture, data flow, and deployment
+- [Original Blog Post](./docs/original_blog_and_readme.md) - Complete project history, examples, and detailed walkthrough
+- [Support](./docs/SUPPORT.md)
+- [Contributing](./CONTRIBUTING.md)
+- [Changelog](./CHANGELOG.md)
 
 ## Configuration
 
@@ -163,16 +111,33 @@ Configuration is managed via `cdk.json` under the `context.config` key:
 ```json
 {
   "config": {
+    "logging": {
+      "lambda_log_level": "INFO",
+      "streamlit_log_level": "INFO"
+    },
     "paths": {
+      "assets_folder_name": "assets",
+      "lambdas_source_folder": "code/lambdas",
+      "layers_source_folder": "code/layers",
+      "athena_data_destination_prefix": "data_query_data_source",
+      "athena_table_data_prefix": "ec2_pricing",
+      "knowledgebase_destination_prefix": "knowledgebase_data_source",
       "knowledgebase_file_name": "cna_wisdom.zip",
-      "athena_table_data_prefix": "ec2_pricing"
+      "agent_schema_destination_prefix": "agent_api_schema",
+      "fewshot_examples_path": "dynamic_examples.csv"
+    },
+    "names": {
+      "bedrock_agent_name": "chatbotBedrockAgent-${timestamp}",
+      "bedrock_agent_alias": "bedrockAgent",
+      "streamlit_lambda_function_name": "invokeAgentLambda"
     },
     "models": {
-      "bedrock_agent_foundation_model": "anthropic.claude-3-sonnet-20240229-v1:0"
+      "bedrock_agent_foundation_model": "anthropic.claude-3-haiku-20240307-v1:0"
     },
     "bedrock_instructions": {
       "agent_instruction": "...",
-      "knowledgebase_instruction": "..."
+      "knowledgebase_instruction": "...",
+      "action_group_description": "..."
     }
   }
 }
@@ -181,9 +146,12 @@ Configuration is managed via `cdk.json` under the `context.config` key:
 ## Security Features
 
 - KMS encryption for S3 buckets and CloudWatch logs
-- Input validation and sanitization
-- Rate limiting on agent invocations
+- Input validation and sanitization with character whitelisting
+- SQL injection prevention with keyword whitelisting
+- Rate limiting on agent invocations (configurable, default 60/min)
+- Secure session management with cryptographic tokens
 - Audit logging for compliance
+- HTTP security headers (X-Frame-Options, CSP, HSTS, etc.)
 - Configurable security group IP restrictions:
 
 ```bash
@@ -192,6 +160,47 @@ cdk deploy --parameters SourceIpAddress=$(curl -s https://checkip.amazonaws.com)
 
 # Allow all (default)
 cdk deploy
+```
+
+## Usage Examples
+
+### Invoking the Agent via Lambda
+
+```python
+import boto3
+import json
+
+lambda_client = boto3.client('lambda')
+
+response = lambda_client.invoke(
+    FunctionName='sec-advis-asst-invokeAgentLambda-<account>-<region>',
+    InvocationType='RequestResponse',
+    Payload=json.dumps({
+        'body': {
+            'query': 'What CWE applies to a buffer overflow vulnerability?',
+            'session_id': 'unique-session-id'
+        }
+    })
+)
+
+result = json.loads(response['Payload'].read())
+print(result['answer'])
+print(result['source'])
+```
+
+### Using Security Decorators
+
+```python
+from code.security.middleware import validate_input, error_handler, rate_limit
+from code.security.security_config import safe_log
+
+@error_handler
+@rate_limit(max_calls=10, time_window=60)
+@validate_input
+def process_query(user_input: str, session_id: str) -> dict:
+    safe_log(f"Processing query for session: {session_id}")
+    # Your logic here
+    return {"result": "success"}
 ```
 
 ## Customization
@@ -208,13 +217,6 @@ cdk deploy
 2. Update `cdk.json` → `paths.athena_table_data_prefix`
 3. Update `code/lambdas/action-lambda/prompt_templates.py`
 4. Add examples to `code/lambdas/action-lambda/dynamic_examples.csv`
-
-## Documentation
-
-- [Full Documentation](./docs/README_20251226.md) - Complete project details and examples
-- [Support](./docs/SUPPORT.md)
-- [Contributing](./CONTRIBUTING.md)
-- [Changelog](./CHANGELOG.md)
 
 ## License
 
