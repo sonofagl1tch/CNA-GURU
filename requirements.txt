@@ -12,7 +12,7 @@ bcrypt>=4.0.1        # For password hashing
 python-dotenv>=1.0.0 # For secure environment variable handling
 validators>=0.21.0   # CVE fix: CWE-1333 ReDoS
 bleach>=6.1.0        # For HTML sanitization
-urllib3>=1.26.19     # CVE fix: CWE-212 Improper Removal of Sensitive Information
+urllib3>=2.6.3     # CVE fix: CWE-212 Improper Removal of Sensitive Information
 certifi>=2023.7.22   # For SSL/TLS certificates
 pyOpenSSL>=23.2.0    # For SSL/TLS support
 
